@@ -10,7 +10,8 @@ class EncoderBlock(nn.Module):
     - Layer normalization
     NOTE: GELU instead of ReLU is used as per the BART paper
     """
-    def __init__(self, config):
+    def __init__(self, 
+                 config):
         super().__init__()
         
         self.self_attention = MultiHeadAttention(
@@ -29,7 +30,9 @@ class EncoderBlock(nn.Module):
             nn.Linear(config.encoder_ff_dim, config.d_model),
             nn.Dropout(config.dropout) 
         )
-    def forward(self, x, attention_mask=None):
+    def forward(self, 
+                x, 
+                attention_mask=None):
         # tidbit: residual connection is used to avoid the vanishing gradient problem
         # also the way we have implemented this is called "pre layer normalization" since BART paper uses this 
         residual = x
