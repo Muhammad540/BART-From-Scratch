@@ -57,8 +57,13 @@ class MultiHeadAttention(nn.Module):
         Returns:
             Tensor of shape [batch size, num heads, seq len, d_k]
         """
+        similarity = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(self.d_k)
+        if mask is not None:
+            similarity = similarity.masked_fill(mask == 0, -1e9)
+        attention_weights = F.softmax(similarity, dim=-1)
+        attention_weights = self.dropout(attention_weights)
         
-        
-        
+        attention_scores = torch.matmul(attention_weights, v)
+        return attention_scores, attention_weights
     
     
