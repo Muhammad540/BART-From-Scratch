@@ -58,7 +58,7 @@ class DecoderBlock(nn.Module):
             query=x,
             key=x,
             value=x,
-            attention_mask=self_attention_mask
+            mask=self_attention_mask
         )
         x = x + residual
         
@@ -81,8 +81,7 @@ class DecoderBlock(nn.Module):
         x = self.layer_norm3(x)
         x = self.feed_forward(x)
         x = x + residual
-        
-        # Alot of skipping going on here :D
+
         return x
         
         
