@@ -12,7 +12,6 @@ model_config:
     decoder_ff_dim: 1024
     dropout: 0.1
     attention_dropout: 0.1
-    activation_dropout: 0.1
     pad_token_id: 1
     begin_sequence_token_id: 0
     end_sequence_token_id: 2
