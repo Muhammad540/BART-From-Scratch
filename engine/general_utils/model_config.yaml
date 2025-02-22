@@ -4,7 +4,6 @@ model_config:
     vocab_size: 50265
     max_seq_len: 512
     d_model: 512
-    num_heads: 8
     encoder_layers: 3
     decoder_layers: 3
     encoder_attention_heads: 8
