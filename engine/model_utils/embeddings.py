@@ -1,18 +1,6 @@
 import torch 
 import torch.nn as nn 
 import math 
-import yaml
-
-def load_model_config():
-    with open('engine/general_utils/model_config.yaml', 'r') as file:
-        config = yaml.safe_load(file)
-    return config
-
-model_config = load_model_config()['model_config']
-d_model = model_config['d_model']
-max_seq_len = model_config['max_seq_len']
-dropout_prob = model_config['dropout']
-vocab_size = model_config['vocab_size']
 
 class PositionalEncoding(nn.Module):
     """
@@ -21,7 +9,10 @@ class PositionalEncoding(nn.Module):
     This will add positional information to the input embeddings since transformer architectures 
     don't inherently understand the sequence order
     """
-    def __init__(self, embedding_dim: int = d_model, max_sequence_length: int = max_seq_len, dropout_prob: float = dropout_prob):
+    def __init__(self,
+                 embedding_dim: int,
+                 max_sequence_length: int,
+                 dropout_prob: float):
         super().__init__()
         
         self.dropout = nn.Dropout(p=dropout_prob)
@@ -37,7 +28,8 @@ class PositionalEncoding(nn.Module):
         # since the positional encoding are not learned, we can simply store them in model state
         self.register_buffer('pe', pe)
     
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, 
+                x: torch.Tensor) -> torch.Tensor:
         """
         Args:
             x: Input Tensor of shape [batch size, seq len, embedding dim]
@@ -52,12 +44,15 @@ class TokenEmbedding(nn.Module):
     Embeds the input tokens into a vector space of dimension d_model
     Also we have to scale the embeddings by sqrt(d_model) as described in the paper page 5
     """
-    def __init__(self, vocab_size: int = vocab_size, embedding_dim: int = d_model):
+    def __init__(self,
+                 vocab_size: int,
+                 embedding_dim: int):
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embedding_dim)
         self.embedding_dim = embedding_dim
         
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, 
+                x: torch.Tensor) -> torch.Tensor:
         """
         Args:
             x: Input Tensor of shape [batch size, seq len]
