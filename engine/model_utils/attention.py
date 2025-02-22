@@ -2,18 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math 
-import yaml
 from typing import Optional 
-
-def load_model_config():
-    with open('engine/general_utils/model_config.yaml', 'r') as file:
-        config = yaml.safe_load(file)
-    return config
-    
-model_config = load_model_config()
-d_model = model_config['d_model']
-num_heads = model_config['num_heads']
-dropout = model_config['dropout']
 
 class MultiHeadAttention(nn.Module):
     """
@@ -29,9 +18,9 @@ class MultiHeadAttention(nn.Module):
     """
     def __init__(
         self, 
-        d_model: int = d_model, 
-        num_heads: int = num_heads, 
-        dropout: float = dropout):
+        d_model: int, 
+        num_heads: int, 
+        dropout: float):
         super().__init__()
         assert d_model % num_heads == 0, "d_model must be divisible by num_heads"
         
