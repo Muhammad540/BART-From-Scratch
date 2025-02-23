@@ -7,6 +7,7 @@ from .embeddings import TokenEmbedding, PositionalEncoding
 class BartEncoder(nn.Module):
     """
     Fully stacked with encoder blocks 
+    A single encoder block is defined in encoder.py
     """
     def __init__(self, 
                  config):
@@ -49,6 +50,7 @@ class BartEncoder(nn.Module):
 class BartDecoder(nn.Module):
     """
     Fully stacked with decoder blocks 
+    A single decoder block is defined in decoder.py
     """
     def __init__(self,
                  config):
