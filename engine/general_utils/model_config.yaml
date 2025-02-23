@@ -15,3 +15,5 @@ model_config:
     pad_token_id: 1
     begin_sequence_token_id: 0
     end_sequence_token_id: 2
+    beam_size: 4
+    max_seq_len: 10000
