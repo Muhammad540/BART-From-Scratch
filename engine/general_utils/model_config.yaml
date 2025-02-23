@@ -17,3 +17,12 @@ model_config:
     end_sequence_token_id: 2
     beam_size: 4
     max_seq_len: 10000
+
+learning_rate: 3e-5
+adam_beta1: 0.9
+adam_beta2: 0.999
+adam_epsilon: 1e-8
+weight_decay: 0.01
+warmup_steps: 500
+max_steps: 100000
+max_grad_norm: 1.0
