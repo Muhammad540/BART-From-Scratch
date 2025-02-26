@@ -54,7 +54,7 @@ class DecoderBlock(nn.Module):
         """
         residual = x
         x = self.layer_norm1(x)
-        x = self.masked_self_attention(
+        x, _ = self.masked_self_attention(
             query=x,
             key=x,
             value=x,

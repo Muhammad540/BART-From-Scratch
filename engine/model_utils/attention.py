@@ -97,14 +97,14 @@ class MultiHeadAttention(nn.Module):
         k = k.view(batch_size, -1, self.num_heads, self.d_k).transpose(1, 2)
         v = v.view(batch_size, -1, self.num_heads, self.d_k).transpose(1, 2)
         
-        output, attention_weights = self.attention(q, k, v, mask)
+        attention_scores, attention_weights = self.attention(q, k, v, mask)
         
         # combine the heads (sounds kinda weird)
         # lets break down the math 
         # output -> [batch size, num heads, seq len, dk] 
         # revoke the transpose -> [batch size, seq len, num heads, dk]
         # view it back to [batch size, seq len, num heads * dk]
-        combined = output.transpose(1, 2).contiguous().view(batch_size, -1, self.d_model)
+        combined = attention_scores.transpose(1, 2).contiguous().view(batch_size, -1, self.d_model)
         
         # project it back to d_model
         projected = self.out_proj(combined)
