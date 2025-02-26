@@ -20,7 +20,7 @@ class BartEncoder(nn.Module):
         
         self.positional_encoding = PositionalEncoding(
             embedding_dim=config.d_model,
-            max_sequence_length=config.max_sequence_length,
+            max_sequence_length=config.max_seq_len,
             dropout_prob=config.dropout
         )
         
