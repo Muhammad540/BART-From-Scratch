@@ -69,7 +69,7 @@ class DecoderBlock(nn.Module):
         # this is why it is called "cross attention"
         residual = x
         x = self.layer_norm2(x)
-        x = self.cross_attention(
+        x, _ = self.cross_attention(
             query=x,
             key=encoder_output,
             value=encoder_output,
