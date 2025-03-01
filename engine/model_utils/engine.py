@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from .transformer import BartEncoder, BartDecoder
+from .sampling import BeamSearchGenerator
+from .sampling import GreedyGenerator
 
 class BART(nn.Module):
     """
@@ -12,6 +14,8 @@ class BART(nn.Module):
                  config):
         super().__init__()
         
+        self.config = config
+        self.max_seq_len = config.max_seq_len
         self.encoder = BartEncoder(config)
         self.decoder = BartDecoder(config)
         # Tie the decoder embedding and output projection layer weights 
@@ -25,15 +29,15 @@ class BART(nn.Module):
                 input_ids,
                 decoder_input_ids,
                 encoder_padding_mask=None,
-                decoder_padding_mask=None,
+                encoder_decoder_attention_mask=None,
                 decoder_causal_mask=None,
                 labels=None):
         """
-        Args:
+        Args:   
             input_ids: (batch_size, seq_len)
             decoder_input_ids: (batch_size, seq_len)
             encoder_padding_mask: (batch_size, seq_len)
-            decoder_padding_mask: (batch_size, seq_len)
+            encoder_decoder_attention_mask: (batch_size, seq_len, seq_len)
             decoder_causal_mask: (batch_size, seq_len, seq_len)
             labels: (batch_size, seq_len)
         Returns:
@@ -45,7 +49,7 @@ class BART(nn.Module):
         decoder_output = self.decoder(decoder_input_ids,
                                       encoder_output=encoder_output,
                                       self_attention_mask=decoder_causal_mask,
-                                      cross_attention_mask=decoder_padding_mask)
+                                      cross_attention_mask=encoder_decoder_attention_mask)
         
         if labels is not None:
             loss = F.cross_entropy(
@@ -58,3 +62,25 @@ class BART(nn.Module):
             return decoder_output, loss
         
         return decoder_output
+    
+    def generate(self,
+                 input_ids,
+                 use_greedy=False,
+                 attention_mask=None):
+        '''
+        This method will be used to generate summaries using the beam search algo that we implemented
+        
+        ArgS:
+            input_ids: input token ids (batch size, seq len)
+            attention_mask: Attention mask for the input (batch size, seq len)
+        '''
+        if use_greedy:
+            greedy_generator = GreedyGenerator(self, self.config)
+            return greedy_generator.generate(
+                input_ids,
+                attention_mask=attention_mask,
+                max_length=self.max_seq_len
+            )
+        else:
+            beam_generator = BeamSearchGenerator(self, self.config)
+            return beam_generator.generate(input_ids, attention_mask)
