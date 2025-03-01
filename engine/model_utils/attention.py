@@ -75,7 +75,7 @@ class MultiHeadAttention(nn.Module):
             query: [batch size, seq len q, d model]
             key: [batch size, seq len k, d model]
             value: [batch size, seq len v, d model]
-            mask: [batch size, seq len q, seq len k]
+            mask: [batch size, 1, seq len q, seq len k]
         
         Returns:
             Two tensors output and attention weights
