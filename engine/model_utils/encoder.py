@@ -39,7 +39,15 @@ class EncoderBlock(nn.Module):
         
         # attention with residual connection
         x = self.layer_norm1(x)
-        x = self.self_attention(
+        
+        if attention_mask is not None:
+            # convert from (batch size, seq len) to (batch size, 1, 1, seq len)
+            attention_mask = attention_mask.unsqueeze(1).unsqueeze(2)
+            # now expand to (batch size, 1, seq len, seq len)
+            seq_len = attention_mask.size(3)
+            attention_mask = attention_mask.expand(-1, -1, seq_len, -1)
+        
+        x, _ = self.self_attention(
             query=x,
             key=x,
             value=x,
