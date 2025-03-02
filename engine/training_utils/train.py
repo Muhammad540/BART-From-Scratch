@@ -74,9 +74,9 @@ def train(config_path,
         "train_loss": [],
         "val_loss": [],
         "perplexity": [],
-        "rouge-1": [],
-        "rouge-2": [],
-        "rouge-l": [],
+        "rouge1": [],
+        "rouge2": [],
+        "rougeL": [],
         "learning_rate": []
     }
     
@@ -100,7 +100,7 @@ def train(config_path,
             causal_mask = torch.tril(torch.ones(seq_len, seq_len)).unsqueeze(0).unsqueeze(0).to(device)
             
             # create a cross attention mask with dim [batch_size, 1, decoder_seq_len, encoder_seq_len]
-            # this will allow the decoder position to attend to all encoder positions 
+            # this will allow EACH decoder position to attend to all encoder positions 
             # Note: we use the encoder's attention mask, not decoder attention mask because 
             # we need to prevent attending to padding tokens in the encoder sequence
             encoder_decoder_attention_mask = attention_mask.unsqueeze(1).unsqueeze(2).expand(-1,-1,seq_len,-1)
@@ -145,7 +145,7 @@ def train(config_path,
                 metrics_history["perplexity"].append((global_step, perplexity))
                 metrics_history["learning_rate"].append((global_step, scheduler.get_last_lr()[0]))
                 
-                # after waiting for start_eval_gen steps, we will generate some summaries
+                # after waiting for start_eval_gen steps, we will generate some summaries for vibe checks
                 if global_step > start_eval_gen:
                     print("\n---Sample Generation---")
                     sample_input = input_ids[0:1]
@@ -160,8 +160,8 @@ def train(config_path,
                     generated_text = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)
                     original_text = tokenizer.batch_decode(sample_input, skip_special_tokens=True)
                 
-                    print(f"Original: {original_text[0][:100]}")
-                    print(f"Generated: {generated_text[0][:100]}")
+                    print(f"Original: {original_text[0]}")
+                    print(f"Generated: {generated_text[0]}")
 
         
         model.eval()
@@ -183,7 +183,7 @@ def train(config_path,
                 causal_mask = torch.tril(torch.ones(dec_seq_len, dec_seq_len)).unsqueeze(0).unsqueeze(0).to(device)
                 
                 # create a cross attention mask with dim [batch_size, 1, decoder_seq_len, encoder_seq_len]
-                # this will allow the decoder position to attend to all encoder positions 
+                # this will allow EACH decoder position to attend to all encoder positions 
                 # Note: we use the encoder's attention mask, not decoder attention mask because 
                 # we need to prevent attending to padding tokens in the encoder sequence
                 encoder_decoder_attention_mask = attention_mask.unsqueeze(1).unsqueeze(2).expand(-1,-1,dec_seq_len,-1)
@@ -191,7 +191,7 @@ def train(config_path,
                 # forward pass
                 _,loss = model(
                     input_ids=input_ids,
-                    decoder_input_ids=decoder_input_ids,
+                    decoder_input_ids=decoder_input_ids, 
                     encoder_padding_mask=attention_mask,
                     encoder_decoder_attention_mask=encoder_decoder_attention_mask,
                     decoder_causal_mask=causal_mask,
@@ -208,18 +208,10 @@ def train(config_path,
                         use_greedy=True
                     )
                     
-                    for j in range(len(generated_ids)):
-                        generated_summary = tokenizer.decode(
-                            generated_ids[j],
-                            skip_special_tokens=True,
-                        )
-                        reference_summary = tokenizer.decode(
-                            labels[j],
-                            skip_special_tokens=True
-                        )
-                        
-                        all_preds.append(generated_summary)
-                        all_targets.append(reference_summary)
+                    generated_summaries = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)
+                    reference_summaries = tokenizer.batch_decode(labels, skip_special_tokens=True)
+                    all_preds.extend(generated_summaries)
+                    all_targets.extend(reference_summaries)
                         
                 
         avg_val_loss = val_loss / val_step
@@ -227,13 +219,13 @@ def train(config_path,
         
         if all_preds:
             rouge_scores = calculate_rouge(all_preds, all_targets)
-            rouge1 = rouge_scores['rouge-1']['f']
-            rouge2 = rouge_scores['rouge-2']['f']
-            rougel = rouge_scores['rouge-l']['f']
+            rouge1 = rouge_scores['rouge1']
+            rouge2 = rouge_scores['rouge2']
+            rougel = rouge_scores['rougeL']
             
-            metrics_history['rouge-1'].append((global_step, rouge1))
-            metrics_history['rouge-2'].append((global_step, rouge2))
-            metrics_history['rouge-l'].append((global_step, rougel))
+            metrics_history['rouge1'].append((global_step, rouge1))
+            metrics_history['rouge2'].append((global_step, rouge2))
+            metrics_history['rougeL'].append((global_step, rougel))
             
             print(f"\nROUGE Scores - R1: {rouge1:.4f}, R2: {rouge2:.4f}, RL: {rougel:.4f}")
         

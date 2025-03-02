@@ -65,29 +65,25 @@ def evaluate(checkpoint_path,
             
             generated_ids = model.generate(
                 input_ids=input_ids,
-                attention_mask=attention_mask,
-                use_hf_generation=False
+                attention_mask=attention_mask
             )
     
-            for j in range(len(generated_ids)):
-                generated_summary = tokenizer.decode(generated_ids[j], skip_special_tokens=True)
-                reference_summary = tokenizer.decode(batch["labels"][j], skip_special_tokens=True)
-                article = tokenizer.decode(input_ids[j], skip_special_tokens=True)
-                
-                all_preds.append(generated_summary)
-                all_targets.append(reference_summary)
+            generated_summaries = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)
+            reference_summaries = tokenizer.batch_decode(batch["labels"], skip_special_tokens=True)
+            all_preds.extend(generated_summaries)
+            all_targets.extend(reference_summaries)
     
     rouge_scores = calculate_rouge(all_preds, all_targets)
     
     print(f"ROUGE Scores: ")
-    print(f"ROUGE-1: {rouge_scores['rouge-1']['f']:.4f}")
-    print(f"ROUGE-2: {rouge_scores['rouge-2']['f']:.4f}")
-    print(f"ROUGE-L: {rouge_scores['rouge-l']['f']:.4f}")
+    print(f"ROUGE-1: {rouge_scores['rouge1']:.4f}")
+    print(f"ROUGE-2: {rouge_scores['rouge2']:.4f}")
+    print(f"ROUGE-L: {rouge_scores['rougeL']:.4f}")
     
     print("\n Sample Summaries:")
     for i in range(min(3, len(all_preds))):
         print(f"\nArticle {i+1}:")
-        print(article[i][:500])
+        print(all_preds[i])
         print(f"\nGenerated Summary: {all_preds[i]}")
         print(f"Reference Summary: {all_targets[i]}")
     
