@@ -54,6 +54,7 @@ def evaluate(checkpoint_path,
     tokenizer = BartTokenizer.from_pretrained("facebook/bart-base")
     
     all_preds, all_targets = [], []
+    all_articles = []
     
     with torch.no_grad():
         for i, batch in enumerate(tqdm(test_dataloader, desc="Generating Summaries")):
@@ -65,13 +66,17 @@ def evaluate(checkpoint_path,
             
             generated_ids = model.generate(
                 input_ids=input_ids,
-                attention_mask=attention_mask
+                attention_mask=attention_mask,
+                use_greedy=True
             )
     
             generated_summaries = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)
             reference_summaries = tokenizer.batch_decode(batch["labels"], skip_special_tokens=True)
+            articles = tokenizer.batch_decode(input_ids, skip_special_tokens=True)
+            
             all_preds.extend(generated_summaries)
             all_targets.extend(reference_summaries)
+            all_articles.extend(articles)
     
     rouge_scores = calculate_rouge(all_preds, all_targets)
     
@@ -83,7 +88,7 @@ def evaluate(checkpoint_path,
     print("\n Sample Summaries:")
     for i in range(min(3, len(all_preds))):
         print(f"\nArticle {i+1}:")
-        print(all_preds[i])
+        print(all_articles[i])
         print(f"\nGenerated Summary: {all_preds[i]}")
         print(f"Reference Summary: {all_targets[i]}")
     
