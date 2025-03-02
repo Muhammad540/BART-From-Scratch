@@ -1,9 +1,13 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from .transformer import BartEncoder, BartDecoder
-from .sampling import BeamSearchGenerator
-from .sampling import GreedyGenerator
+from engine.model_utils.transformer import BartEncoder, BartDecoder
+from engine.model_utils.beamsearch import BeamSearchGenerator
+from engine.model_utils.greedy import GreedyGenerator
 
 class BART(nn.Module):
     """

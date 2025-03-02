@@ -1,8 +1,12 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
 import torch
 import torch.nn as nn
-from .encoder import EncoderBlock
-from .decoder import DecoderBlock
-from .embeddings import TokenEmbedding, PositionalEncoding
+from engine.model_utils.encoder import EncoderBlock
+from engine.model_utils.decoder import DecoderBlock
+from engine.model_utils.embeddings import TokenEmbedding, PositionalEncoding
 
 class BartEncoder(nn.Module):
     """

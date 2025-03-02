@@ -1,6 +1,10 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
 import torch
 import torch.nn as nn
-from .attention import MultiHeadAttention
+from engine.model_utils.attention import MultiHeadAttention
 
 class DecoderBlock(nn.Module):
     """
@@ -19,13 +23,13 @@ class DecoderBlock(nn.Module):
         self.masked_self_attention = MultiHeadAttention(
             d_model=config.d_model,
             num_heads=config.decoder_attention_heads,
-            dropout=config.decoder_attention_dropout,
+            dropout=config.dropout,
         )
         
         self.cross_attention = MultiHeadAttention(
             d_model=config.d_model,
             num_heads=config.decoder_attention_heads,
-            dropout=config.decoder_attention_dropout,
+            dropout=config.dropout,
         )
         
         self.layer_norm1 = nn.LayerNorm(config.d_model)

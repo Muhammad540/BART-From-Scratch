@@ -1,20 +1,29 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
 import torch
 import torch.optim as optim 
 import yaml
-import os
 import math 
 import numpy as np
 from tqdm import tqdm 
 from engine.model_utils.engine import BART 
 from engine.data_utils.dataset_loading import load_cnn_dailymail
-from engine.training_utils.metrics import calculate_rouge
 from transformers import get_linear_schedule_with_warmup, BartTokenizer
+from engine.training_utils.config import Config
+# watch this: https://www.youtube.com/watch?v=TMshhnrEXlg&ab_channel=HuggingFace
+import evaluate
 
-class Config:
-    """simple class to store the config"""
-    def __init__(self, config_dict):
-        for key, value in config_dict.items():
-            setattr(self, key, value)
+def calculate_rouge(predictions, references):
+    rouge = evaluate.load("rouge")
+    
+    results = rouge.compute(
+        predictions=predictions,
+        references=references,
+        use_stemmer=True
+    )
+    return {k: round(v,4) for k,v in results.items()}
 
 def train(config_path,
           save_dir):
@@ -37,7 +46,7 @@ def train(config_path,
     batch_size = config.batch_size
     num_epochs = config.num_epochs
     max_seq_len = config.max_seq_len
-    learning_rate = config.learning_rate
+    learning_rate = float(config.learning_rate)
     warmup_steps = config.warmup_steps
     max_grad_norm = config.max_grad_norm
     log_every = config.log_every

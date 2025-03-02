@@ -1,12 +1,25 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
 import torch
 from tqdm import tqdm 
 from engine.model_utils.engine import BART 
 from engine.data_utils.dataset_loading import load_cnn_dailymail
 import yaml 
-import os
-from engine.training_utils.train import Config
-from engine.training_utils.metrics import calculate_rouge
+from engine.training_utils.config import Config
 from transformers import BartTokenizer
+import evaluate
+
+def calculate_rouge(predictions, references):
+    rouge = evaluate.load("rouge")
+    
+    results = rouge.compute(
+        predictions=predictions,
+        references=references,
+        use_stemmer=True
+    )
+    return {k: round(v,4) for k,v in results.items()}
 
 def evaluate(checkpoint_path,
              config_path):

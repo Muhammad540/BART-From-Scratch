@@ -1,12 +1,15 @@
-import argparse
+import sys
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
+import argparse
 from engine.training_utils.train import train
 from engine.training_utils.evaluate import evaluate
 
 def main():
     parser = argparse.ArgumentParser(description="Train and evaluate BART model")
     parser.add_argument("--mode", choices=["train", "evaluate"], default="train", help="Mode: train or evaluate")
-    parser.add_argument("--config", default="engine/general_utils/model_config.yaml", help="Path to the model configuration file")
+    parser.add_argument("--config", default=os.path.join(os.path.dirname(__file__), "../general_utils/model_config.yaml"), help="Path to the model configuration file")
     parser.add_argument("--checkpoint", help="Path to model checkpoint (for evaluation)")
     parser.add_argument("--save_dir", default="checkpoints", help="Directory to save checkpoints")
     

@@ -1,6 +1,10 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
 import torch
 import torch.nn as nn
-from .attention import MultiHeadAttention
+from engine.model_utils.attention import MultiHeadAttention
 
 class EncoderBlock(nn.Module):
     """
@@ -17,7 +21,7 @@ class EncoderBlock(nn.Module):
         self.self_attention = MultiHeadAttention(
             d_model=config.d_model,
             num_heads=config.encoder_attention_heads,
-            dropout=config.encoder_attention_dropout,
+            dropout=config.dropout,
         )
         
         self.layer_norm1 = nn.LayerNorm(config.d_model)
