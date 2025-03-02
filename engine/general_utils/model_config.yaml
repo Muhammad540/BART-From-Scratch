@@ -15,7 +15,7 @@ begin_sequence_token_id: 0     # special token ids used in generation and proces
 end_sequence_token_id: 2       # special token ids used in generation and processing
 beam_size: 4                   # control the num of paths in beam search
 batch_size: 16                 # batch size (how many examples are batched together to train in parallel)
-learning_rate: 3e-5            # learning rate decides how big of a step you should take in the GD
+learning_rate: 3.0e-5            # learning rate decides how big of a step you should take in the GD
 warmup_steps: 500              # used in the learning rate scheduler
 max_grad_norm: 1.0             # maximum gradient norm used for clipping (used in the training loop  )
 num_epochs: 3                  # number  full passes through the training data
