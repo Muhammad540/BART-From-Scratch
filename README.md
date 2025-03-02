@@ -9,12 +9,12 @@ An Encoder-Decoder Transformer from scratch to summarize news articles
 ## Training 
 
 ```bash
-python lets_train.py --mode train --config engine/general_utils/model_config.yaml
+python lets_train.py --mode train --config ../general_utils/model_config.yaml
 ```
 
 ## Evaluation 
 
 ```bash
-python lets_train.py --mode evaluate --config engine/general_utils/model_config.yaml --checkpoint <path_to_checkpoint>
+python lets_train.py --mode evaluate --config ../general_utils/model_config.yaml --checkpoint <path_to_checkpoint>
 ```
 
