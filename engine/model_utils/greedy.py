@@ -7,6 +7,7 @@ class GreedyGenerator:
     def __init__(self, model, config):
         self.model = model
         self.config = config
+        self.max_seq_len = config.max_seq_len
         self.begin_sequence_token_id = config.begin_sequence_token_id
         self.end_sequence_token_id = config.end_sequence_token_id
     
@@ -42,9 +43,9 @@ class GreedyGenerator:
         # keep track of which sequences are done
         done = [False for _ in range(batch_size)]
         
-        # generate tokens one by one without any limits
+        # generate tokens one by one with a maximum length constraint
         step = 0
-        while not all(done):
+        while not all(done) and step < self.max_seq_len -1 : 
             step += 1
             curr_len = curr_ids.size(1)
             
