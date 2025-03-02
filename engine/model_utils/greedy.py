@@ -7,7 +7,6 @@ class GreedyGenerator:
     def __init__(self, model, config):
         self.model = model
         self.config = config
-        self.max_seq_len = config.max_seq_len
         self.begin_sequence_token_id = config.begin_sequence_token_id
         self.end_sequence_token_id = config.end_sequence_token_id
     
@@ -43,18 +42,15 @@ class GreedyGenerator:
         # keep track of which sequences are done
         done = [False for _ in range(batch_size)]
         
-        # generate tokens one by one
-        for step in range(self.max_seq_len):
-            if all(done):
-                print(f"All sequences completed at step {step}")
-                break
-                
+        # generate tokens one by one without any limits
+        step = 0
+        while not all(done):
+            step += 1
             curr_len = curr_ids.size(1)
             
-            # create causal mask for decoder
+            # causal mask for decoder
             causal_mask = self._get_causal_mask(curr_ids)
-            
-            # create cross-attention mask
+            # cross-attention mask
             if attention_mask is not None:
                 cross_mask = attention_mask.unsqueeze(1).unsqueeze(2).expand(-1, -1, curr_len, -1)
             else:
@@ -70,15 +66,16 @@ class GreedyGenerator:
             
             # get logits for next token
             next_token_logits = decoder_outputs[:, -1, :]
-            
             # get the most likely token
             next_token = torch.argmax(next_token_logits, dim=-1).unsqueeze(1)
             curr_ids = torch.cat([curr_ids, next_token], dim=1)
             
-            # check if any sequence has reached the end of the sequence
             for i in range(batch_size):
                 if next_token[i, 0] == self.end_sequence_token_id:
                     done[i] = True
+            
+            if all(done):
+                print(f"All sequences completed at step {step}")
         
         # remove BOS token if it's at the beginning
         final_outputs = []
