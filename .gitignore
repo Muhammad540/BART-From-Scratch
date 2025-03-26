@@ -1,0 +1,9 @@
+venv/
+.cursorignore
+# Python cache files
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.Python
+.coverage
