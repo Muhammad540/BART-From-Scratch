@@ -7,7 +7,7 @@ An Encoder-Decoder Transformer trained from scratch to summarize news articles u
 3. Huggingface Evaluate (for rouge metrics)
 
 ## Training + Evaluation on colab (preferred)
-To quickly start training and play with the model configuration, head to Notebook/TransformerFromScratch.ipynb.
+To quickly start training and play with the model configuration, head to:  **Notebook/TransformerFromScratch.ipynb**
 
 Run the notebook on Google Colab. You will need to adjust the model configuration, such as the number of encoder and decoder layers, the number of attention heads, and the batch size, to avoid running out of GPU RAM if you are on a free trial. The cool part is that once you start training the model, you will observe the model's output as it begins learning and improving its generations!
 
